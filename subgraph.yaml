@@ -1,0 +1,59 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: TradeTrustERC721
+    network: rinkeby
+    source:
+      abi: TradeTrustERC721
+      address: ""
+      startBlock:
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - TradeTrustERC721
+        - TitleEscrowCloneable
+      abis:
+        - name: TradeTrustERC721
+          file: ./node_modules/@govtechsg/token-registry/dist/abis/TradeTrustERC721.sol/TradeTrustERC721.json
+        - name: TitleEscrowCloneable
+          file: ./node_modules/@govtechsg/token-registry/dist/abis/TitleEscrowCloneable.sol/TitleEscrowCloneable.json
+      eventHandlers:
+        - event: TitleEscrowDeployed(indexed address,indexed address,address,address)
+          handler: handleTitleEscrowDeployed
+        - event: TokenRestored(indexed uint256,indexed address)
+          handler: handleTokenRestored
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mapping.ts
+templates:
+  - kind: ethereum/contract
+    name: TitleEscrowCloneable
+    network: rinkeby
+    source:
+      abi: TitleEscrowCloneable
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mapping.ts
+      entities:
+        - TitleEscrowCloneable
+        - TradeTrustERC721
+      abis:
+        - name: TitleEscrowCloneable
+          file: ./node_modules/@govtechsg/token-registry/dist/abis/TitleEscrowCloneable.sol/TitleEscrowCloneable.json
+        - name: TradeTrustERC721
+          file: ./node_modules/@govtechsg/token-registry/dist/abis/TradeTrustERC721.sol/TradeTrustERC721.json
+      eventHandlers:
+        - event: Surrender(indexed address,indexed uint256,indexed address)
+          handler: handleSurrender
+        - event: TransferTitleEscrowApproval(indexed address,indexed address)
+          handler: handleTransferTitleEscrowApproval
+        - event: TitleCeded(indexed address,indexed address,indexed uint256)
+          handler: handleTitleCeded
+        - event: HolderChanged(indexed address,indexed address)
+          handler: handleHolderChanged
