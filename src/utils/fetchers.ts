@@ -49,7 +49,6 @@ export function fetchTokenRegistry(tokenRegistryAddress: Address): TokenRegistry
 }
 
 export function fetchToken(registry: TokenRegistry, tokenId: BigInt): Token {
-  // const id = `${registry.id}/${tokenId.toHex()}`;
   const id = getTokenEntityId(registry.id, tokenId);
   let token = Token.load(id);
 
