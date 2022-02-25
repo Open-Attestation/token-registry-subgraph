@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import {
   TitleEscrowDeployed as TitleEscrowDeployedEvent,
   Transfer as TransferEvent,
@@ -61,12 +61,6 @@ export function handleTransfer(event: TransferEvent): void {
     acceptanceEvent.accepter = fetchAccount(event.transaction.from).id;
     acceptanceEvent.save();
   }
-
-  log.debug("tokenTransferEvent event.params.from toTitleEscrow: {} {} {}", [
-    event.params.from.toHex(),
-    event.params.to.toHex(),
-    toTitleEscrow !== null ? toTitleEscrow.id : "null",
-  ]);
 }
 
 export function handleTitleEscrowDeployed(event: TitleEscrowDeployedEvent): void {

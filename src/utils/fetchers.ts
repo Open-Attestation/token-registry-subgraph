@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts/index";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts/index";
 import { Account, TitleEscrow, Token, TokenRegistry, Transaction } from "../../generated/schema";
 import { TradeTrustERC721 } from "../../generated/TradeTrustERC721/TradeTrustERC721";
 import { TitleEscrowCloneable } from "../../generated/templates/TitleEscrowCloneable/TitleEscrowCloneable";
@@ -26,16 +26,9 @@ export function fetchAccount(address: Address): Account {
 }
 
 export function fetchTokenRegistry(tokenRegistryAddress: Address): TokenRegistry {
-  log.debug("fetchTokenRegistry {} {} {}", [
-    tokenRegistryAddress.toHexString(),
-    tokenRegistryAddress.toHex(),
-    tokenRegistryAddress.toString(),
-  ]);
-
   let registry = TokenRegistry.load(tokenRegistryAddress.toHex());
 
   if (registry == null) {
-    log.debug("fetchTokenRegistry contract is null", []);
     const tokenRegistry = TradeTrustERC721.bind(tokenRegistryAddress);
     registry = new TokenRegistry(tokenRegistryAddress.toHex());
     const tryRegistryName = tokenRegistry.try_name();
