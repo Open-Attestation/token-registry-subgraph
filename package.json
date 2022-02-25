@@ -1,0 +1,18 @@
+{
+  "name": "token-registry-subgraph",
+  "license": "Apache-2.0",
+  "scripts": {
+    "codegen": "rm -rf generated && graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ test-tradetrust-subgraph",
+    "create-local": "graph create --node http://localhost:8020/ test-tradetrust-subgraph",
+    "remove-local": "graph remove --node http://localhost:8020/ test-tradetrust-subgraph",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 test-tradetrust-subgraph"
+  },
+  "dependencies": {
+    "@govtechsg/token-registry": "^4.0.0-beta.5",
+    "@graphprotocol/graph-cli": "0.26.0",
+    "@graphprotocol/graph-ts": "0.24.1",
+    "@openzeppelin/subgraphs": "^0.1.7-1"
+  }
+}
