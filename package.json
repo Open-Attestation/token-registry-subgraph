@@ -10,10 +10,9 @@
     "remove-local": "graph remove --node http://localhost:8020/ token-registry-subgraph",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 token-registry-subgraph"
   },
-  "dependencies": {
+  "devDependencies": {
     "@govtechsg/token-registry": "^4.0.0-beta.5",
     "@graphprotocol/graph-cli": "0.26.0",
-    "@graphprotocol/graph-ts": "0.24.1",
-    "@openzeppelin/subgraphs": "^0.1.7-1"
+    "@graphprotocol/graph-ts": "0.24.1"
   }
 }
