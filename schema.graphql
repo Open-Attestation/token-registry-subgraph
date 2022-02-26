@@ -23,6 +23,8 @@ type Account @entity {
   id: ID!
   titleEscrowsAsBeneficiary: [TitleEscrow!]! @derivedFrom(field: "beneficiary")
   titleEscrowsAsHolder: [TitleEscrow!]! @derivedFrom(field: "holder")
+  tokensAsBeneficiary: [Token!]! @derivedFrom(field: "beneficiary")
+  tokensAsHolder: [Token!]! @derivedFrom(field: "holder")
   tokenTransfersAsFromBeneficiary: [TokenTransfer!]! @derivedFrom(field: "fromBeneficiary")
   tokenTransfersAsFromHolder: [TokenTransfer!]! @derivedFrom(field: "fromHolder")
   tokenTransfersAsToBeneficiary: [TokenTransfer!]! @derivedFrom(field: "toBeneficiary")
@@ -110,6 +112,8 @@ type Token @entity {
   documentIdHex: String!
   registry: TokenRegistry!
   titleEscrow: TitleEscrow
+  beneficiary: Account
+  holder: Account
   surrendered: Boolean!
   transferEvents: [TokenTransfer!]! @derivedFrom(field: "token")
   titleEscrowHolderTransferEvents: [TitleEscrowHolderTransfer!]! @derivedFrom(field: "token")
