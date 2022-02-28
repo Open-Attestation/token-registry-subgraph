@@ -60,6 +60,8 @@ export function handleTitleCeded(event: TitleCededEvent): void {
 }
 
 export function handleHolderChanged(event: HolderChangedEvent): void {
+  if (event.params.previousHolder.equals(Address.zero())) return;
+
   const titleEscrowEntity = fetchTitleEscrow(event.address);
 
   const tokenEntity = Token.load(titleEscrowEntity.token);
@@ -69,9 +71,7 @@ export function handleHolderChanged(event: HolderChangedEvent): void {
   }
 
   const entityId = `${event.address.toHex()}-${event.logIndex.toString()}`;
-  const prevHolder = event.params.previousHolder.equals(Address.zero())
-    ? ""
-    : event.params.previousHolder.toHex();
+  const prevHolder = event.params.previousHolder.toHex();
 
   const titleEscrowHolderTransferEntity = new TitleEscrowHolderTransfer(entityId);
   titleEscrowHolderTransferEntity.transaction = fetchTransaction(event).id;
