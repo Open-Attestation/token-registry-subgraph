@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts/index";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export function mapTitleEscrowStatusEnum(enumIdx: BigInt): string {
   if (enumIdx.equals(BigInt.fromI32(0))) {
@@ -15,4 +15,8 @@ export function mapTitleEscrowStatusEnum(enumIdx: BigInt): string {
 
 export function getTokenEntityId(tokenRegistryId: String, tokenId: BigInt): string {
   return `${tokenRegistryId}/${tokenId.toHex()}`;
+}
+
+export function getEventId(event: ethereum.Event): string {
+  return `${event.transaction.hash.toHex()}-${event.logIndex.toString()}`;
 }
