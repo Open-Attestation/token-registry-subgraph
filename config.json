@@ -1,0 +1,9 @@
+{
+  "network": "rinkeby",
+  "dataSources": [
+    {
+      "address": "0xabc",
+      "startBlock": 12345678
+    }
+  ]
+}

@@ -2,6 +2,7 @@
   "name": "token-registry-subgraph",
   "license": "Apache-2.0",
   "scripts": {
+    "prepare": "node scripts/prepare.js",
     "codegen": "rm -rf generated && graph codegen",
     "build": "graph build",
     "deploy:studio": "graph deploy --node https://api.studio.thegraph.com/deploy/ token-registry-subgraph",
@@ -13,6 +14,7 @@
   "devDependencies": {
     "@govtechsg/token-registry": "^4.0.0-beta.5",
     "@graphprotocol/graph-cli": "0.26.0",
-    "@graphprotocol/graph-ts": "0.24.1"
+    "@graphprotocol/graph-ts": "0.24.1",
+    "handlebars": "^4.7.7"
   }
 }

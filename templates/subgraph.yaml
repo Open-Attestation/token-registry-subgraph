@@ -2,13 +2,14 @@ specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
+  #  {{#each dataSources}}
   - kind: ethereum
     name: TradeTrustERC721
-    network: rinkeby
+    network: {{network}}
     source:
       abi: TradeTrustERC721
-      address: ""
-      startBlock:
+      address: "{{address}}"
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -29,11 +30,12 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
       file: ./src/main.ts
+  #  {{/each}}
 
 templates:
   - kind: ethereum/contract
     name: TitleEscrowCloneable
-    network: rinkeby
+    network: {{network}}
     source:
       abi: TitleEscrowCloneable
     mapping:
