@@ -6,8 +6,18 @@ The subgraph for the OpenAttestation [Token Registry](https://github.com/Open-At
 
 This subgraph allows anyone to easily query the network for information about the records from and create opportunities for applications to build on top of your Token Registry contracts.
 
+## Table of Contents
+- [Development](#development)
+  - [Configuration](#configuration)
+  - [Installation](#installation)
+- [Deployment](#deployment)
+  - [Graph Studio](#graph-studio)
+  - [Hosted Service](#hosted-service)
+- [Example Queries](#example-queries)
+
 ## Development
 
+### Configuration
 Configure your Token Registry contract addresses in the `config.json` file.
 
 ```json
@@ -27,6 +37,7 @@ Configure your Token Registry contract addresses in the `config.json` file.
 * The `address` is the address of your Token Registry contract and `startBlock` is the start block of your contract.
 * You can index multiple Token Registry contracts by adding to the `dataSources` array
 
+### Installation
 Next, install and generate the subgraph:
 
 ```
