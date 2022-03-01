@@ -24,7 +24,7 @@ import { getTokenEntityId, mapTitleEscrowStatusEnum } from "./utils/helpers";
 
 export function handleTransfer(event: TransferEvent): void {
   const tokenRegistry = fetchTokenRegistry(event.address);
-  const token = fetchToken(tokenRegistry, event.params.tokenId);
+  const tokenEntity = fetchToken(tokenRegistry, event.params.tokenId);
   const fromTitleEscrow = TitleEscrow.load(event.params.from.toHex());
   const toTitleEscrow = TitleEscrow.load(event.params.to.toHex());
 
@@ -35,7 +35,7 @@ export function handleTransfer(event: TransferEvent): void {
   tokenTransferEvent.transaction = transactionEntity.id;
   tokenTransferEvent.timestamp = event.block.timestamp;
   tokenTransferEvent.registry = tokenRegistry.id;
-  tokenTransferEvent.token = token.id;
+  tokenTransferEvent.token = tokenEntity.id;
 
   if (fromTitleEscrow !== null) {
     tokenTransferEvent.fromTitleEscrow = fromTitleEscrow.id;
@@ -47,9 +47,15 @@ export function handleTransfer(event: TransferEvent): void {
     tokenTransferEvent.toTitleEscrow = toTitleEscrow.id;
     tokenTransferEvent.toBeneficiary = toTitleEscrow.beneficiary;
     tokenTransferEvent.toHolder = toTitleEscrow.holder;
+    tokenEntity.beneficiary = toTitleEscrow.beneficiary;
+    tokenEntity.holder = toTitleEscrow.holder;
+  } else {
+    tokenEntity.beneficiary = null;
+    tokenEntity.holder = null;
   }
 
   tokenTransferEvent.save();
+  tokenEntity.save();
 
   const deadAddress = Address.fromString("0x000000000000000000000000000000000000dEaD");
   if (event.params.to.equals(deadAddress)) {
@@ -57,7 +63,7 @@ export function handleTransfer(event: TransferEvent): void {
     acceptanceEvent.transaction = transactionEntity.id;
     acceptanceEvent.timestamp = event.block.timestamp;
     acceptanceEvent.registry = tokenRegistry.id;
-    acceptanceEvent.token = token.id;
+    acceptanceEvent.token = tokenEntity.id;
     acceptanceEvent.accepter = fetchAccount(event.transaction.from).id;
     acceptanceEvent.save();
   }

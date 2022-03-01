@@ -3,7 +3,7 @@ import {
   HolderChanged as HolderChangedEvent, Surrender as SurrenderEvent, TitleCeded as TitleCededEvent,
   TitleEscrowCloneable, TransferTitleEscrowApproval as TransferTitleEscrowApprovalEvent,
 } from "../generated/templates/TitleEscrowCloneable/TitleEscrowCloneable";
-import { Surrender, TitleEscrowApproval, TitleEscrowHolderTransfer } from "../generated/schema";
+import { Surrender, TitleEscrowApproval, TitleEscrowHolderTransfer, Token } from "../generated/schema";
 import { fetchAccount, fetchTitleEscrow, fetchToken, fetchTokenRegistry, fetchTransaction } from "./utils/fetchers";
 import { getTokenEntityId } from "./utils/helpers";
 
@@ -60,22 +60,23 @@ export function handleTitleCeded(event: TitleCededEvent): void {
 }
 
 export function handleHolderChanged(event: HolderChangedEvent): void {
-  const titleEscrowContract = TitleEscrowCloneable.bind(event.address);
+  if (event.params.previousHolder.equals(Address.zero())) return;
 
   const titleEscrowEntity = fetchTitleEscrow(event.address);
 
-  const tryRegistryAddress = titleEscrowContract.try_tokenRegistry();
+  const tokenEntity = Token.load(titleEscrowEntity.token);
+  if (tokenEntity !== null) {
+    tokenEntity.holder = event.params.newHolder.toHex();
+    tokenEntity.save();
+  }
 
   const entityId = `${event.address.toHex()}-${event.logIndex.toString()}`;
-  const registryAddress = tryRegistryAddress.reverted ? Address.zero().toHex() : tryRegistryAddress.value.toHex();
-  const prevHolder = event.params.previousHolder.equals(Address.zero())
-    ? ""
-    : event.params.previousHolder.toHex();
+  const prevHolder = event.params.previousHolder.toHex();
 
   const titleEscrowHolderTransferEntity = new TitleEscrowHolderTransfer(entityId);
   titleEscrowHolderTransferEntity.transaction = fetchTransaction(event).id;
   titleEscrowHolderTransferEntity.timestamp = event.block.timestamp;
-  titleEscrowHolderTransferEntity.registry = registryAddress;
+  titleEscrowHolderTransferEntity.registry = titleEscrowEntity.registry;
   titleEscrowHolderTransferEntity.token = titleEscrowEntity.token;
   titleEscrowHolderTransferEntity.titleEscrow = event.address.toHex();
   titleEscrowHolderTransferEntity.beneficiary = titleEscrowEntity.beneficiary;
