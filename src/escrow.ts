@@ -1,14 +1,14 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts/index";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import {
   HolderChanged as HolderChangedEvent, Surrender as SurrenderEvent, TitleCeded as TitleCededEvent,
   TitleEscrowCloneable, TransferTitleEscrowApproval as TransferTitleEscrowApprovalEvent,
 } from "../generated/templates/TitleEscrowCloneable/TitleEscrowCloneable";
 import { Surrender, TitleEscrowApproval, TitleEscrowHolderTransfer, Token } from "../generated/schema";
 import { fetchAccount, fetchTitleEscrow, fetchToken, fetchTokenRegistry, fetchTransaction } from "./utils/fetchers";
-import { getTokenEntityId } from "./utils/helpers";
+import { getEventId, getTokenEntityId } from "./utils/helpers";
 
 export function handleSurrender(event: SurrenderEvent): void {
-  const eventId = `${event.transaction.hash.toHex()}-${event.logIndex.toString()}`;
+  const eventId = getEventId(event);
 
   const registryEntity = fetchTokenRegistry(event.params.tokenRegistry);
   const tokenEntity = fetchToken(registryEntity, event.params.tokenId);
@@ -27,7 +27,7 @@ export function handleSurrender(event: SurrenderEvent): void {
 }
 
 export function handleTransferTitleEscrowApproval(event: TransferTitleEscrowApprovalEvent): void {
-  const eventId = `${event.transaction.hash.toHex()}-${event.logIndex.toString()}`;
+  const eventId = getEventId(event);
 
   const titleEscrowContract = TitleEscrowCloneable.bind(event.address);
   const tryRegistryAddress = titleEscrowContract.try_tokenRegistry();

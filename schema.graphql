@@ -4,6 +4,15 @@ enum TitleEscrowStatus {
   Exited
 }
 
+enum TokenTransferType {
+  Unknown
+  Mint
+  Restoration
+  Acceptance
+  Surrender
+  TitleEscrowTransfer
+}
+
 type TitleEscrow @entity {
   id: ID!
   registry: TokenRegistry!
@@ -135,6 +144,9 @@ type TokenTransfer implements Event @entity {
   fromHolder: Account
   toBeneficiary: Account
   toHolder: Account
+
+  "Inferred token transfer type"
+  type: TokenTransferType!
 }
 
 interface Event {

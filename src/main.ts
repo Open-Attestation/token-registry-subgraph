@@ -20,7 +20,7 @@ import {
   fetchToken,
   fetchTokenRegistry,
 } from "./utils/fetchers";
-import { getTokenEntityId, mapTitleEscrowStatusEnum } from "./utils/helpers";
+import { getEventId, getTokenEntityId, mapTitleEscrowStatusEnum } from "./utils/helpers";
 
 export function handleTransfer(event: TransferEvent): void {
   const tokenRegistry = fetchTokenRegistry(event.address);
@@ -36,11 +36,18 @@ export function handleTransfer(event: TransferEvent): void {
   tokenTransferEvent.timestamp = event.block.timestamp;
   tokenTransferEvent.registry = tokenRegistry.id;
   tokenTransferEvent.token = tokenEntity.id;
+  tokenTransferEvent.type = "Unknown";
 
   if (fromTitleEscrow !== null) {
     tokenTransferEvent.fromTitleEscrow = fromTitleEscrow.id;
     tokenTransferEvent.fromBeneficiary = fromTitleEscrow.beneficiary;
     tokenTransferEvent.fromHolder = fromTitleEscrow.holder;
+  } else {
+    if (event.params.from.equals(Address.zero())) {
+      tokenTransferEvent.type = "Mint";
+    } else {
+      tokenTransferEvent.type = "Restoration";
+    }
   }
 
   if (toTitleEscrow !== null) {
@@ -54,11 +61,15 @@ export function handleTransfer(event: TransferEvent): void {
     tokenEntity.holder = null;
   }
 
-  tokenTransferEvent.save();
-  tokenEntity.save();
+  if (fromTitleEscrow !== null && toTitleEscrow !== null) {
+    tokenTransferEvent.type = "TitleEscrowTransfer";
+  } else if (fromTitleEscrow !== null && toTitleEscrow == null) {
+    tokenTransferEvent.type = "Surrender";
+  }
 
   const deadAddress = Address.fromString("0x000000000000000000000000000000000000dEaD");
   if (event.params.to.equals(deadAddress)) {
+    tokenTransferEvent.type = "Acceptance";
     const acceptanceEvent = new Acceptance(`${eventId}/Acceptance`);
     acceptanceEvent.transaction = transactionEntity.id;
     acceptanceEvent.timestamp = event.block.timestamp;
@@ -67,6 +78,9 @@ export function handleTransfer(event: TransferEvent): void {
     acceptanceEvent.accepter = fetchAccount(event.transaction.from).id;
     acceptanceEvent.save();
   }
+
+  tokenTransferEvent.save();
+  tokenEntity.save();
 }
 
 export function handleTitleEscrowDeployed(event: TitleEscrowDeployedEvent): void {
@@ -104,7 +118,12 @@ export function handleTokenRestored(event: TokenRestoredEvent): void {
 
   const tokenEntityId = getTokenEntityId(event.address.toHex(), event.params.tokenId);
 
-  const eventId = `${transactionEntity.id}-${event.logIndex.toString()}`;
+  const eventId = getEventId(event);
+
+  const tokenTransferEntity = TokenTransfer.load(`${eventId}/TokenTransfer`);
+  if (tokenTransferEntity !== null) {
+    tokenTransferEntity.type = "Restoration";
+  }
 
   const restorationEvent = new Restoration(`${eventId}/Restoration`);
   restorationEvent.transaction = transactionEntity.id;
