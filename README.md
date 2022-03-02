@@ -60,7 +60,7 @@ npm run prepare
 
 ## Deployment
 
-The deployment can be done either to the Graph Studio or Hosted Service.
+The deployment can be done either to the Graph Studio or Hosted Service depending on the network.
 
 ### Graph Studio
 
@@ -89,7 +89,7 @@ graph auth --product hosted-service
 Then deploy the subgraph:
 
 ```
-graph deploy --product hosted-studio GITHUB_USERNAME/token-registry-subgraph
+graph deploy --product hosted-service GITHUB_USERNAME/token-registry-subgraph
 ```
 
 Alternatively, you can edit the Github username and subgraph name in `package.json` and run `npm run deploy:hosted` to
@@ -139,7 +139,7 @@ There are many interesting queries that can be made. Here are some example queri
             holder {
               id
             }
-            }
+          }
           toTitleEscrow {
             beneficiary {
               id
