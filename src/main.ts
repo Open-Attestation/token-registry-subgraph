@@ -21,6 +21,7 @@ import {
   fetchTokenRegistry,
 } from "./utils/fetchers";
 import { getEventId, getTokenEntityId, mapTitleEscrowStatusEnum } from "./utils/helpers";
+import { constants } from "./utils/constants";
 
 export function handleTransfer(event: TransferEvent): void {
   const tokenRegistry = fetchTokenRegistry(event.address);
@@ -67,8 +68,7 @@ export function handleTransfer(event: TransferEvent): void {
     tokenTransferEvent.type = "Surrender";
   }
 
-  const deadAddress = Address.fromString("0x000000000000000000000000000000000000dEaD");
-  if (event.params.to.equals(deadAddress)) {
+  if (event.params.to.equals(constants.DeadAddress)) {
     tokenTransferEvent.type = "Acceptance";
     const acceptanceEvent = new Acceptance(`${eventId}/Acceptance`);
     acceptanceEvent.transaction = transactionEntity.id;
