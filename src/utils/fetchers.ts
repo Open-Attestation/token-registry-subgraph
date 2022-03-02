@@ -1,8 +1,9 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts/index";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Account, TitleEscrow, Token, TokenRegistry, Transaction } from "../../generated/schema";
 import { TradeTrustERC721 } from "../../generated/TradeTrustERC721/TradeTrustERC721";
 import { TitleEscrowCloneable } from "../../generated/templates/TitleEscrowCloneable/TitleEscrowCloneable";
 import { getTokenEntityId, mapTitleEscrowStatusEnum } from "./helpers";
+import { constants } from "./constants";
 import { TitleEscrowCloneable as TitleEscrowTemplate } from "../../generated/templates";
 
 export function fetchTransaction(event: ethereum.Event): Transaction {
@@ -47,7 +48,9 @@ export function fetchToken(registry: TokenRegistry, tokenId: BigInt): Token {
 
   const tokenRegistry = TradeTrustERC721.bind(Address.fromString(registry.id));
   const tryOwnerOfToken = tokenRegistry.try_ownerOf(tokenId);
-  const tryIsSurrendered = tokenRegistry.try_isSurrendered(tokenId);
+
+  const tokenOwner: Address | null = tryOwnerOfToken.reverted ? null : tryOwnerOfToken.value;
+  let isSurrendered = false;
 
   if (token == null) {
     token = new Token(id);
@@ -56,9 +59,14 @@ export function fetchToken(registry: TokenRegistry, tokenId: BigInt): Token {
     token.registry = registry.id;
   }
 
-  const isSurrendered = tryIsSurrendered.reverted ? false : tryIsSurrendered.value;
+  if (tokenOwner !== null && (
+    tokenOwner.equals(Address.fromString(registry.id)) ||
+    tokenOwner.equals(constants.DeadAddress)
+  )) {
+    isSurrendered = true;
+  }
 
-  token.titleEscrow = isSurrendered || tryOwnerOfToken.reverted ? null : tryOwnerOfToken.value.toHex();
+  token.titleEscrow = isSurrendered || !tokenOwner ? null : tokenOwner.toHex();
   token.surrendered = isSurrendered;
 
   token.save();
