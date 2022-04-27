@@ -16,17 +16,15 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - TradeTrustERC721
-        - TitleEscrowCloneable
+        - TitleEscrow
       abis:
         - name: TradeTrustERC721
-          file: ./node_modules/@govtechsg/token-registry/dist/abis/TradeTrustERC721.sol/TradeTrustERC721.json
-        - name: TitleEscrowCloneable
-          file: ./node_modules/@govtechsg/token-registry/dist/abis/TitleEscrowCloneable.sol/TitleEscrowCloneable.json
+          file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TradeTrustERC721Base.sol/TradeTrustERC721Base.json
+        - name: TitleEscrowFactory
+          file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TitleEscrowFactory.sol/TitleEscrowFactory.json
+        - name: TitleEscrow
+          file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TitleEscrow.sol/TitleEscrow.json
       eventHandlers:
-        - event: TitleEscrowDeployed(indexed address,indexed address,address,address)
-          handler: handleTitleEscrowDeployed
-        - event: TokenRestored(indexed uint256,indexed address)
-          handler: handleTokenRestored
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
       file: ./src/main.ts
@@ -34,10 +32,10 @@ dataSources:
 
 templates:
   - kind: ethereum/contract
-    name: TitleEscrowCloneable
+    name: TitleEscrow
     network: {{network}}
     source:
-      abi: TitleEscrowCloneable
+      abi: TitleEscrow
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -47,16 +45,22 @@ templates:
         - TitleEscrowCloneable
         - TradeTrustERC721
       abis:
-        - name: TitleEscrowCloneable
-          file: ./node_modules/@govtechsg/token-registry/dist/abis/TitleEscrowCloneable.sol/TitleEscrowCloneable.json
+        - name: TitleEscrow
+          file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TitleEscrow.sol/TitleEscrow.json
+        - name: TitleEscrowFactory
+          file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TitleEscrowFactory.sol/TitleEscrowFactory.json
         - name: TradeTrustERC721
-          file: ./node_modules/@govtechsg/token-registry/dist/abis/TradeTrustERC721.sol/TradeTrustERC721.json
+          file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TradeTrustERC721Base.sol/TradeTrustERC721Base.json
       eventHandlers:
-        - event: Surrender(indexed address,indexed uint256,indexed address)
+        - event: Surrender(indexed address,address,uint256)
           handler: handleSurrender
-        - event: TransferTitleEscrowApproval(indexed address,indexed address)
-          handler: handleTransferTitleEscrowApproval
-        - event: TitleCeded(indexed address,indexed address,indexed uint256)
-          handler: handleTitleCeded
-        - event: HolderChanged(indexed address,indexed address)
-          handler: handleHolderChanged
+        - event: TokenReceived(indexed address,indexed address,indexed bool,address,uint256)
+          handler: handleTokenReceived
+        - event: Nomination(indexed address,indexed address,address,uint256)
+          handler: handleNomination
+        - event: BeneficiaryTransfer(indexed address,indexed address,address,uint256)
+          handler: handleBeneficiaryTransfer
+        - event: HolderTransfer(indexed address,indexed address,address,uint256)
+          handler: handleHolderTransfer
+        - event: Shred(address,uint256)
+          handler: handleShred

@@ -1,104 +1,126 @@
-enum TitleEscrowStatus {
-  Uninitialised
-  InUse
-  Exited
-}
-
-enum TokenTransferType {
+enum TokenActionType {
   Unknown
-  Mint
+  Issuance
   Restoration
   Acceptance
   Surrender
-  TitleEscrowTransfer
+  Nomination
+  NominationRevocation
+  BeneficiaryTransfer
+  HolderTransfer
 }
 
 type TitleEscrow @entity {
   id: ID!
   registry: TokenRegistry!
   token: Token!
-  beneficiary: Account!
-  holder: Account!
-  status: TitleEscrowStatus
-  titleEscrowHolderTransferEvents: [TitleEscrowHolderTransfer!]! @derivedFrom(field: "titleEscrow")
-  tokenTransferFromEvents: [TokenTransfer!]! @derivedFrom(field: "fromTitleEscrow")
-  tokenTransferToEvents: [TokenTransfer!]! @derivedFrom(field: "toTitleEscrow")
-  surrenderEvents: [Surrender!]! @derivedFrom(field: "titleEscrow")
-  restorationEvents: [Restoration!]! @derivedFrom(field: "titleEscrow")
-  approvalEvents: [TitleEscrowApproval!]! @derivedFrom(field: "titleEscrow")
+  beneficiary: Account
+  holder: Account
+  nominee: Account
+  active: Boolean!
+  beneficiaryTransfers: [BeneficiaryTransfer!]! @derivedFrom(field: "titleEscrow")
+  holderTransfers: [HolderTransfer!]! @derivedFrom(field: "titleEscrow")
+  nominations: [Nomination!]! @derivedFrom(field: "titleEscrow")
+  surrenders: [Surrender!]! @derivedFrom(field: "titleEscrow")
+  restorations: [Restoration!]! @derivedFrom(field: "titleEscrow")
+  issuances: [Issuance!]! @derivedFrom(field: "titleEscrow")
 }
 
 type Account @entity {
   id: ID!
   titleEscrowsAsBeneficiary: [TitleEscrow!]! @derivedFrom(field: "beneficiary")
   titleEscrowsAsHolder: [TitleEscrow!]! @derivedFrom(field: "holder")
-  tokensAsBeneficiary: [Token!]! @derivedFrom(field: "beneficiary")
-  tokensAsHolder: [Token!]! @derivedFrom(field: "holder")
-  tokenTransfersAsFromBeneficiary: [TokenTransfer!]! @derivedFrom(field: "fromBeneficiary")
-  tokenTransfersAsFromHolder: [TokenTransfer!]! @derivedFrom(field: "fromHolder")
-  tokenTransfersAsToBeneficiary: [TokenTransfer!]! @derivedFrom(field: "toBeneficiary")
-  tokenTransfersAsToHolder: [TokenTransfer!]! @derivedFrom(field: "toHolder")
-  titleEscrowApprovalsAsApprover: [TitleEscrowApproval!]! @derivedFrom(field: "approver")
-  titleEscrowApprovalsAsBeneficiary: [TitleEscrowApproval!]! @derivedFrom(field: "approvedBeneficiary")
-  titleEscrowApprovalsAsHolder: [TitleEscrowApproval!]! @derivedFrom(field: "approvedHolder")
-  titleEscrowHolderTransfersAsHolder: [TitleEscrowHolderTransfer!]! @derivedFrom(field: "holder")
-  titleEscrowHolderTransfersAsPrevHolder: [TitleEscrowHolderTransfer!]! @derivedFrom(field: "prevHolder")
-  acceptanceEventsAsAccepter: [Acceptance!]! @derivedFrom(field: "accepter")
-  restorationEventsAsRestorer: [Restoration!]! @derivedFrom(field: "restorer")
+  titleEscrowsAsNominee: [TitleEscrow!]! @derivedFrom(field: "nominee")
+  beneficiaryTransfersAsFrom: [BeneficiaryTransfer!]! @derivedFrom(field: "from")
+  beneficiaryTransfersAsTo: [BeneficiaryTransfer!]! @derivedFrom(field: "to")
+  beneficiaryTransfersAsInitiator: [BeneficiaryTransfer!]! @derivedFrom(field: "initiator")
+  holderTransfersAsFrom: [HolderTransfer!]! @derivedFrom(field: "from")
+  holderTransfersAsTo: [HolderTransfer!]! @derivedFrom(field: "to")
+  holderTransfersAsInitiator: [HolderTransfer!]! @derivedFrom(field: "initiator")
+  nominationRevocationsAsNominee: [NominationRevocation!]! @derivedFrom(field: "nominee")
+  nominationRevocationsAsInitiator: [NominationRevocation!]! @derivedFrom(field: "initiator")
+  nominationsAsNominee: [Nomination!]! @derivedFrom(field: "nominee")
+  nominationsAsPrevNominee: [Nomination!]! @derivedFrom(field: "prevNominee")
+  nominationsAsInitiator: [Nomination!]! @derivedFrom(field: "initiator")
+  restorationsAsInitiator: [Restoration!]! @derivedFrom(field: "initiator")
+  acceptancesAsInitiator: [Acceptance!]! @derivedFrom(field: "initiator")
+  surrendersAsInitiator: [Surrender!]! @derivedFrom(field: "initiator")
+  issuancesAsBeneficiary: [Issuance!]! @derivedFrom(field: "beneficiary")
+  issuancesAsHolder: [Issuance!]! @derivedFrom(field: "holder")
+  issuancesAsInitiator: [Issuance!]! @derivedFrom(field: "initiator")
+  tokenSnapshotsAsBeneficiary: [TokenSnapshot!]! @derivedFrom(field: "beneficiary")
+  tokenSnapshotsAsHolder: [TokenSnapshot!]! @derivedFrom(field: "holder")
+  tokenSnapshotsAsNominee: [TokenSnapshot!]! @derivedFrom(field: "nominee")
 }
 
-type TitleEscrowHolderTransfer implements Event @entity {
+type Nomination implements Event @entity {
   id: ID!
   transaction: Transaction!
   timestamp: BigInt!
+  tokenSnapshot: TokenSnapshot!
   registry: TokenRegistry!
   token: Token!
   titleEscrow: TitleEscrow!
-  beneficiary: Account!
-  holder: Account!
-  prevHolder: Account
+  nominee: Account!
+  prevNominee: Account
+  initiator: Account!
 }
 
-type TitleEscrowApproval implements Event @entity {
+type NominationRevocation implements Event @entity {
   id: ID!
   transaction: Transaction!
   timestamp: BigInt!
+  tokenSnapshot: TokenSnapshot!
   registry: TokenRegistry!
   token: Token!
   titleEscrow: TitleEscrow!
-  approver: Account!
-  approvedBeneficiary: Account!
-  approvedHolder: Account!
+  nominee: Account!
+  initiator: Account!
 }
 
 type Surrender implements Event @entity {
   id: ID!
   transaction: Transaction!
   timestamp: BigInt!
+  tokenSnapshot: TokenSnapshot!
   registry: TokenRegistry!
   token: Token!
-
-  "Title Escrow which token was surrendered from"
   titleEscrow: TitleEscrow!
+  initiator: Account!
 }
 
 type Restoration implements Event @entity {
   id: ID!
   transaction: Transaction!
   timestamp: BigInt!
+  tokenSnapshot: TokenSnapshot!
   registry: TokenRegistry!
   token: Token!
   titleEscrow: TitleEscrow!
-  restorer: Account!
+  initiator: Account!
 }
 
 type Acceptance implements Event @entity {
   id: ID!
   transaction: Transaction!
   timestamp: BigInt!
+  tokenSnapshot: TokenSnapshot!
   registry: TokenRegistry!
   token: Token!
-  accepter: Account!
+  initiator: Account!
+}
+
+type Issuance implements Event @entity {
+  id: ID!
+  transaction: Transaction!
+  timestamp: BigInt!
+  tokenSnapshot: TokenSnapshot!
+  registry: TokenRegistry!
+  token: Token!
+  beneficiary: Account!
+  holder: Account!
+  titleEscrow: TitleEscrow!
+  initiator: Account!
 }
 
 type TokenRegistry @entity {
@@ -107,52 +129,83 @@ type TokenRegistry @entity {
   symbol: String
   tokens: [Token!]! @derivedFrom(field: "registry")
   titleEscrows: [TitleEscrow!]! @derivedFrom(field: "registry")
-  transferEvents: [TokenTransfer!]! @derivedFrom(field: "registry")
-  titleEscrowHolderTransferEvents: [TitleEscrowHolderTransfer!]! @derivedFrom(field: "registry")
-  titleEscrowApprovalEvents: [TitleEscrowApproval!]! @derivedFrom(field: "registry")
-  surrenderEvents: [Surrender!]! @derivedFrom(field: "registry")
-  restorationEvents: [Restoration!]! @derivedFrom(field: "registry")
-  acceptanceEvents: [Acceptance!]! @derivedFrom(field: "registry")
+  beneficiaryTransfers: [BeneficiaryTransfer!]! @derivedFrom(field: "registry")
+  holderTransfers: [HolderTransfer!]! @derivedFrom(field: "registry")
+  nominations: [Nomination!]! @derivedFrom(field: "registry")
+  nominationRevocations: [NominationRevocation!]! @derivedFrom(field: "registry")
+  surrenders: [Surrender!]! @derivedFrom(field: "registry")
+  restorations: [Restoration!]! @derivedFrom(field: "registry")
+  acceptances: [Acceptance!]! @derivedFrom(field: "registry")
+  issuances: [Issuance!]! @derivedFrom(field: "registry")
+  tokenSnapshots: [TokenSnapshot!]! @derivedFrom(field: "registry")
 }
 
 type Token @entity {
   id: ID!
-  documentId: BigInt!
-  documentIdHex: String!
+  documentId: String!
+  documentIdInt: BigInt!
   registry: TokenRegistry!
-  titleEscrow: TitleEscrow
-  beneficiary: Account
-  holder: Account
+  titleEscrow: TitleEscrow!
   surrendered: Boolean!
-  transferEvents: [TokenTransfer!]! @derivedFrom(field: "token")
-  titleEscrowHolderTransferEvents: [TitleEscrowHolderTransfer!]! @derivedFrom(field: "token")
-  titleEscrowApprovalEvents: [TitleEscrowApproval!]! @derivedFrom(field: "token")
-  surrenderEvents: [Surrender!]! @derivedFrom(field: "token")
-  restorationEvents: [Restoration!]! @derivedFrom(field: "token")
-  acceptanceEvents: [Acceptance!]! @derivedFrom(field: "token")
+  accepted: Boolean!
+  beneficiaryTransfers: [BeneficiaryTransfer!]! @derivedFrom(field: "token")
+  holderTransfers: [HolderTransfer!]! @derivedFrom(field: "token")
+  nominations: [Nomination!]! @derivedFrom(field: "token")
+  nominationRevocations: [NominationRevocation!]! @derivedFrom(field: "token")
+  surrenders: [Surrender!]! @derivedFrom(field: "token")
+  restorations: [Restoration!]! @derivedFrom(field: "token")
+  acceptances: [Acceptance!]! @derivedFrom(field: "token")
+  issuances: [Issuance!]! @derivedFrom(field: "token")
+  tokenSnapshots: [TokenSnapshot!]! @derivedFrom(field: "token")
 }
 
-type TokenTransfer implements Event @entity {
+type TokenSnapshot @entity {
+  id: ID!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  token: Token!
+  registry: TokenRegistry!
+
+  beneficiary: Account
+  holder: Account
+  nominee: Account
+  surrendered: Boolean!
+  accepted: Boolean!
+
+  action: TokenActionType!
+}
+
+type BeneficiaryTransfer implements Event @entity {
   id: ID!
   transaction: Transaction!
   timestamp: BigInt!
   registry: TokenRegistry!
   token: Token!
-  fromTitleEscrow: TitleEscrow
-  toTitleEscrow: TitleEscrow
-  fromBeneficiary: Account
-  fromHolder: Account
-  toBeneficiary: Account
-  toHolder: Account
+  tokenSnapshot: TokenSnapshot!
+  titleEscrow: TitleEscrow!
+  from: Account
+  to: Account
+  initiator: Account!
+}
 
-  "Inferred token transfer type"
-  type: TokenTransferType!
+type HolderTransfer implements Event @entity {
+  id: ID!
+  transaction: Transaction!
+  timestamp: BigInt!
+  registry: TokenRegistry!
+  token: Token!
+  tokenSnapshot: TokenSnapshot!
+  titleEscrow: TitleEscrow!
+  from: Account
+  to: Account
+  initiator: Account!
 }
 
 interface Event {
   id: ID!
   transaction: Transaction!
   timestamp: BigInt!
+  tokenSnapshot: TokenSnapshot!
 }
 
 type Transaction @entity {
