@@ -237,7 +237,7 @@ export function handleShred(event: ShredEvent): void {
 
   const tryBeneficiary = titleEscrowContract.try_beneficiary();
   const tryHolder = titleEscrowContract.try_holder();
-  const tryNominee = titleEscrowContract.try_beneficiaryNominee();
+  const tryNominee = titleEscrowContract.try_nominee();
   const tryActive = titleEscrowContract.try_active();
 
   titleEscrowEntity.beneficiary = !tryBeneficiary.reverted ? formatAddressValue(tryBeneficiary.value) : titleEscrowEntity.beneficiary;
