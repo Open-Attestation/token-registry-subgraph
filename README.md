@@ -22,7 +22,7 @@ Configure your Token Registry contract addresses in the `config.json` file.
 
 ```json
 {
-  "network": "rinkeby",
+  "network": "goerli",
   "dataSources": [
     {
       "address": "0xabc",
