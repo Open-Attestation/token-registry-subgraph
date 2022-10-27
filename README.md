@@ -22,7 +22,7 @@ Configure your Token Registry contract addresses in the `config.json` file.
 
 ```json
 {
-  "network": "rinkeby",
+  "network": "goerli",
   "dataSources": [
     {
       "address": "0xabc",
@@ -100,74 +100,84 @@ deploy the subgraph to the hosted service.
 There are many interesting queries that can be made. Here are some example queries:
 
 * What are all the document IDs and their surrender statuses in my Token Registries?
-    ```graphql
-    {
-      tokenRegistries {
-        tokens {
-          documentIdHex
-          surrendered
-        }
+  ```graphql
+  {
+    tokenRegistries {
+      tokens {
+        documentId
+        surrendered
       }
     }
-    ```
+  }
+  ```
 * What are all the documents that the user `0xbabe` is currently a beneficiary?
-    ```graphql
-    {
-      accounts (where: {
-        id: "0xbabe"
-      }) {
-        tokensAsBeneficiary {
-          documentIdHex
+  ```graphql
+  {
+    accounts(where: { id: "0xbabe" }) {
+      id
+      titleEscrowsAsBeneficiary {
+        token {
+          documentId
         }
       }
     }
-    ```
+  }
+  ```
+* What about listing snapshots of a document at the time of all actions (issuance, surrender, etc)?
+  ```graphql
+  {
+    tokens(
+      where: { documentId: "0x0ddba11" }
+    ) {
+      tokenSnapshots (orderBy: timestamp) {
+        timestamp
+        action
+        beneficiary {
+          id
+        }
+        holder {
+          id
+        }
+        nominee {
+          id
+        }
+        surrendered
+        accepted 
+      }
+    }
+  }
+  ```  
 * Can I have the complete token transfers (including holder transfers) and approval histories of the document ID `0x0ddba11`? I want to know the beneficiaries and holders that were transferred to and from.
   > 💡 This query is useful (and also a much easier and elegant way) for building the [endorsement chain](https://docs.tradetrust.io/docs/tradetrust-website/endorsement-chain/) of a document or just trying to retrieve the ownership details of any documents.
-    ```graphql
-    {
-      tokens (where: {
-        documentIdHex: "0x0ddba11"
-      }) {
-        transferEvents (orderBy: timestamp) {
-          timestamp
-          type
-          fromTitleEscrow {
-            beneficiary {
-              id
-            }
-            holder {
-              id
-            }
-          }
-          toTitleEscrow {
-            beneficiary {
-              id
-            }
-            holder {
-              id
-            }
-          }
+  ```graphql
+  {
+    tokens(
+      where: { documentId: "0x0ddba11" }
+    ) {
+      beneficiaryTransfers(orderBy: timestamp) {
+        timestamp
+        from {
+          id
         }
-        titleEscrowApprovalEvents (orderBy: timestamp) {
-          timestamp
-          approvedBeneficiary {
-            id
-          }
-          approvedHolder {
-            id
-          }
+        to {
+          id
         }
-        titleEscrowHolderTransferEvents (orderBy: timestamp) {
-          timestamp
-          prevHolder {
-            id
-          }
-          holder {
-            id
-          }
+      }
+      holderTransfers(orderBy: timestamp) {
+        timestamp
+        from {
+          id
+        }
+        to {
+          id
+        }
+      }
+      nominations(orderBy: timestamp) {
+        timestamp
+        nominee {
+          id
         }
       }
     }
-    ```
-
+  }
+  ```
