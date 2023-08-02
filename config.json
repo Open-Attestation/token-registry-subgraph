@@ -1,5 +1,5 @@
 {
-  "network": "goerli",
+  "network": "mumbai",
   "dataSources": [
     {
       "address": "0xabc",
