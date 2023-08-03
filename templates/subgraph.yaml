@@ -4,10 +4,10 @@ schema:
 dataSources:
   #  {{#each dataSources}}
   - kind: ethereum
-    name: TradeTrustERC721
+    name: TradeTrustToken
     network: {{network}}
     source:
-      abi: TradeTrustERC721
+      abi: TradeTrustToken
       address: "{{address}}"
       startBlock: {{startBlock}}
     mapping:
@@ -15,11 +15,11 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - TradeTrustERC721
+        - TradeTrustToken
         - TitleEscrow
       abis:
-        - name: TradeTrustERC721
-          file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TradeTrustERC721Base.sol/TradeTrustERC721Base.json
+        - name: TradeTrustToken
+          file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TradeTrustToken.sol/TradeTrustToken.json
         - name: TitleEscrowFactory
           file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TitleEscrowFactory.sol/TitleEscrowFactory.json
         - name: TitleEscrow
@@ -42,15 +42,15 @@ templates:
       language: wasm/assemblyscript
       file: ./src/escrow.ts
       entities:
-        - TitleEscrowCloneable
-        - TradeTrustERC721
+        - TitleEscrow
+        - TradeTrustToken
       abis:
         - name: TitleEscrow
           file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TitleEscrow.sol/TitleEscrow.json
         - name: TitleEscrowFactory
           file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TitleEscrowFactory.sol/TitleEscrowFactory.json
-        - name: TradeTrustERC721
-          file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TradeTrustERC721Base.sol/TradeTrustERC721Base.json
+        - name: TradeTrustToken
+          file: ./node_modules/@govtechsg/token-registry/dist/artifacts/TradeTrustToken.sol/TradeTrustToken.json
       eventHandlers:
         - event: Surrender(indexed address,address,uint256)
           handler: handleSurrender

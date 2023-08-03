@@ -1,6 +1,6 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Account, TitleEscrow, Token, TokenRegistry, Transaction } from "../../generated/schema";
-import { TradeTrustERC721 } from "../../generated/TradeTrustERC721/TradeTrustERC721";
+import { TradeTrustToken } from "../../generated/TradeTrustToken/TradeTrustToken";
 import {
   TitleEscrow as TitleEscrowContract,
   TokenReceived as TokenReceivedEvent,
@@ -33,7 +33,7 @@ export function fetchTokenRegistry(tokenRegistryAddress: Address): TokenRegistry
   let registry = TokenRegistry.load(tokenRegistryAddress.toHex());
 
   if (registry == null) {
-    const tokenRegistry = TradeTrustERC721.bind(tokenRegistryAddress);
+    const tokenRegistry = TradeTrustToken.bind(tokenRegistryAddress);
     registry = new TokenRegistry(tokenRegistryAddress.toHex());
     const tryRegistryName = tokenRegistry.try_name();
     const tryRegistrySymbol = tokenRegistry.try_symbol();
@@ -50,7 +50,7 @@ export function fetchToken(registry: TokenRegistry, tokenId: BigInt): Token {
   let token = Token.load(id);
 
   if (token == null) {
-    const tokenRegistry = TradeTrustERC721.bind(Address.fromString(registry.id));
+    const tokenRegistry = TradeTrustToken.bind(Address.fromString(registry.id));
     const tryOwnerOfToken = tokenRegistry.try_ownerOf(tokenId);
 
     const tokenOwner: Address | null = tryOwnerOfToken.reverted ? null : tryOwnerOfToken.value;
