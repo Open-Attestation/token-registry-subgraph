@@ -5,16 +5,16 @@
     "prepare": "node scripts/prepare.js",
     "codegen": "rm -rf generated && graph codegen",
     "build": "graph build",
-    "deploy:studio": "graph deploy --node https://api.studio.thegraph.com/deploy/ token-registry-subgraph",
-    "deploy:hosted": "graph deploy --product hosted-studio open-attestation/token-registry-subgraph",
-    "create-local": "graph create --node http://localhost:8020/ token-registry-subgraph",
-    "remove-local": "graph remove --node http://localhost:8020/ token-registry-subgraph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 token-registry-subgraph"
+    "deploy:studio": "graph deploy --node https://api.studio.thegraph.com/deploy/ open-attestation/token-registry-subgraph",
+    "deploy:hosted": "graph deploy --product hosted-service open-attestation/token-registry-subgraph",
+    "create-local": "graph create --node http://localhost:8020/ open-attestation/token-registry-subgraph",
+    "remove-local": "graph remove --node http://localhost:8020/ open-attestation/token-registry-subgraph",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 open-attestation/token-registry-subgraph"
   },
   "devDependencies": {
     "@govtechsg/token-registry": "^4.1.6",
-    "@graphprotocol/graph-cli": "0.26.0",
-    "@graphprotocol/graph-ts": "0.24.1",
+    "@graphprotocol/graph-cli": "~0.52.0",
+    "@graphprotocol/graph-ts": "~0.31.0",
     "handlebars": "^4.7.7"
   }
 }
